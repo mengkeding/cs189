@@ -3,30 +3,33 @@ import scipy.io
 import numpy as np
 import random
 
+# Variables
 DIGIT_DIR="/Users/David/Documents/School/CS189/hw1/data/digit-dataset/"
-IMG_SIZE = 28*28 # known training size
+IMG_SIZE = 28*28 # known image size
 TRAIN_SIZE = 100
-N_SAMPLES = 60000 # Default to all samples
-clf = svm.SVC()
+VALIDATION_SIZE = 10000
+N_SAMPLES = 60000
+clf = svm.SVC(kernel='linear')
 
+# Load Training Set
 train = scipy.io.loadmat(DIGIT_DIR+"train")
-
 train_labels = train['train_labels']
 train_images = train['train_images']
+
+# Flatten Training Set
+flat = train_images.transpose([2,0,1]).ravel()
+flat = [ flat[x:x+IMG_SIZE] for x in range(0, len(flat), IMG_SIZE) ]
+
 
 def trainSVM(n):
     global TRAIN_SIZE
     global clf
     TRAIN_SIZE = n
-    tmp = train_images.transpose([2,0,1])
-    flat = tmp.ravel()
-    flat = [ flat[x:x+IMG_SIZE] for x in range(0, len(flat), IMG_SIZE) ]
 
-    # Random indices
+    # Partition Training Set
     index = random.sample(xrange(len(flat)), TRAIN_SIZE)
     X = []
     y = []
-
     for i in index:
         X.append(flat[i])
         y.append(train_labels[i][0])
@@ -36,4 +39,16 @@ def trainSVM(n):
     print "done"
     print clf
 
-trainSVM(10)
+def validateSVM():
+    validation_indices = random.sample(xrange(len(flat)), VALIDATION_SIZE)
+    count = 0
+    for i in validation_indices:
+        prediction = clf.predict(flat[i])
+        label = train_labels[i]
+        if prediction == label:
+            count = count + 1
+    accuracy = float(count) / VALIDATION_SIZE
+    return accuracy
+
+trainSVM(10000)
+print str(validateSVM()*100)+"%"
