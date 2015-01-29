@@ -1,7 +1,9 @@
 from sklearn import svm
+from sklearn.metrics import confusion_matrix
 import scipy.io
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 import time
 
@@ -23,7 +25,7 @@ train_images = train['train_images'].transpose([2,0,1])
 flat = train_images.ravel().reshape((N_SAMPLES, IMG_SIZE))
 
 
-def trainSVM(n):
+def trainValidateSVM(n, c=1.0):
     clf = svm.SVC(kernel='linear')
     TRAIN_SIZE = n
 
@@ -44,22 +46,30 @@ def trainSVM(n):
     print "done: "+str(end - start)
 
     # Initialize Confusion Matrix
-    confusion_matrix = np.zeros((10,10), dtype=np.int)
+    #confusion_matrix = np.zeros((10,10), dtype=np.int)
 
     print "validating on "+str(VALIDATION_SIZE)+" samples"
     validation_indices = random.sample(xrange(len(flat)), VALIDATION_SIZE)
     # Add to confusion matrix while counting
     count = 0
+    validate_x = []
+    validate_y = []
     for i in validation_indices:
-        prediction = clf.predict(flat[i])[0]
-        label = train_labels[i][0]
-        confusion_matrix[prediction][label] += 1
-        if prediction == label:
-            count = count + 1
+        validate_x.append(flat[i])
+        validate_y.append(train_labels[i][0])
+    predict = clf.predict(validate_x)
+    cm = confusion_matrix(validate_y, predict)
+
     # Calculate accuracy
-    accuracy = float(count) / VALIDATION_SIZE
+    accuracy = clf.score(validate_x, validate_y)
     print "done; printing confusion matrix:"
-    print confusion_matrix
+    #print confusion_matrix
+    plt.matshow(cm)
+    plt.title('Confusion matrix')
+    plt.colorbar()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.show()
     return accuracy
 
 # C value for 'Penalty parameter C of the error term' in SVC
@@ -78,7 +88,7 @@ def tenFold(c=1.0):
     indices = [ x for x in range(VALIDATION_SIZE / 10, VALIDATION_SIZE, VALIDATION_SIZE / 10) ]
     images = np.split(images, indices)
     labels = np.split(labels, indices)
-    clf = svm.SVC(kernel='linear')
+    clf = svm.SVC(kernel='linear', C=c)
     values = []
     for i in range(len(images)-1):
         print "case "+str(i)
@@ -99,17 +109,21 @@ def tenFold(c=1.0):
             if prediction == label:
                 count += 1
         values.append(float(count) / len(validation_images))
-
     print values
     average = sum(values) / len(values)
     return average
 
-#print str(trainSVM(10000)*100)+"%"
+
+#sample_sizes = [100, 200, 500, 1000, 5000, 10000]
+#for n in sample_sizes:
+#    print "Score for "+str(n)+": "+str(trainValidateSVM(n)*100)+"%"
+print str(trainValidateSVM(10000)*100)+"%"
+
 #print "Average 10-fold: "+str(tenFold()*100)+"%"
-c_values = [ pow(10, x) for x in range(-5,6) ]
-d = {}
-for c in c_values:
-    d[c] = tenFold(c)
-
-print "Best C value: "+str(max(d))+": "+str(d[max[d]])
-
+#c_values = [ pow(10, x) for x in range(-5,6) ]
+#d = {}
+#for c in c_values:
+#    print "Testing C: "+str(c)
+#    d[c] = tenFold(c)
+#
+#print d
