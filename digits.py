@@ -3,8 +3,13 @@ import scipy.io
 import numpy as np
 import random
 
+import time
+
 # Variables
+#Mac
 DIGIT_DIR="/Users/David/Documents/School/CS189/hw1/data/digit-dataset/"
+#Linux
+#DIGIT_DIR="/home/david/Documents/cs189/hw1/data/digit-dataset/"
 IMG_SIZE = 28*28 # known image size
 TRAIN_SIZE = 100
 VALIDATION_SIZE = 10000
@@ -17,8 +22,8 @@ train_labels = train['train_labels']
 train_images = train['train_images']
 
 # Flatten Training Set
-flat = train_images.transpose([2,0,1]).ravel()
-flat = [ flat[x:x+IMG_SIZE] for x in range(0, len(flat), IMG_SIZE) ]
+flat = train_images.transpose([2,0,1]).ravel().reshape((N_SAMPLES, IMG_SIZE))
+#flat = np.array([ np.array(flat[x:x+IMG_SIZE]) for x in range(0, len(flat), IMG_SIZE) ])
 
 def trainSVM(n):
     global TRAIN_SIZE
@@ -32,15 +37,19 @@ def trainSVM(n):
     for i in index:
         X.append(flat[i])
         y.append(train_labels[i][0])
+    X = np.array(X)
+    y = np.array(y)
 
     print "training on "+str(TRAIN_SIZE)+" samples"
+    start = time.time()
     clf.fit(X, y)
-    print "done"
+    end = time.time()
+    print "done: "+str(end - start)
     print clf
 
 def validateSVM():
     # Initialize Confusion Matrix
-    confusion_matrix = np.zeros((10,10))
+    confusion_matrix = np.zeros((10,10), dtype=np.int)
 
     print "validating on "+str(VALIDATION_SIZE)+" samples"
     validation_indices = random.sample(xrange(len(flat)), VALIDATION_SIZE)
@@ -56,5 +65,5 @@ def validateSVM():
     print confusion_matrix
     return accuracy
 
-trainSVM(10)
+trainSVM(10000)
 print str(validateSVM()*100)+"%"
