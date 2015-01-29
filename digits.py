@@ -20,7 +20,6 @@ train_images = train['train_images']
 flat = train_images.transpose([2,0,1]).ravel()
 flat = [ flat[x:x+IMG_SIZE] for x in range(0, len(flat), IMG_SIZE) ]
 
-
 def trainSVM(n):
     global TRAIN_SIZE
     global clf
@@ -40,15 +39,22 @@ def trainSVM(n):
     print clf
 
 def validateSVM():
+    # Initialize Confusion Matrix
+    confusion_matrix = np.zeros((10,10))
+
+    print "validating on "+str(VALIDATION_SIZE)+" samples"
     validation_indices = random.sample(xrange(len(flat)), VALIDATION_SIZE)
     count = 0
     for i in validation_indices:
-        prediction = clf.predict(flat[i])
-        label = train_labels[i]
+        prediction = clf.predict(flat[i])[0]
+        label = train_labels[i][0]
+        confusion_matrix[prediction][label] += 1
         if prediction == label:
             count = count + 1
     accuracy = float(count) / VALIDATION_SIZE
+    print "done; printing confusion matrix:"
+    print confusion_matrix
     return accuracy
 
-trainSVM(10000)
+trainSVM(10)
 print str(validateSVM()*100)+"%"
