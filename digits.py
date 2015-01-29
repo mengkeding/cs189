@@ -44,14 +44,8 @@ def trainValidateSVM(n, c=1.0):
     clf.fit(X, y)
     end = time.time()
     print "done: "+str(end - start)
-
-    # Initialize Confusion Matrix
-    #confusion_matrix = np.zeros((10,10), dtype=np.int)
-
     print "validating on "+str(VALIDATION_SIZE)+" samples"
     validation_indices = random.sample(xrange(len(flat)), VALIDATION_SIZE)
-    # Add to confusion matrix while counting
-    count = 0
     validate_x = []
     validate_y = []
     for i in validation_indices:
