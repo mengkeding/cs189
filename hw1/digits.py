@@ -5,13 +5,11 @@ import numpy as np
 import random
 import operator
 import matplotlib.pyplot as plt
+import csv
 
 import time
 
 # Variables
-#Mac
-#DIGIT_DIR="/Users/David/Documents/School/CS189/hw1/data/digit-dataset/"
-#Linux
 DIGIT_DIR="/home/david/Documents/cs189/hw1/data/digit-dataset/"
 IMG_SIZE = 28*28 # known image size
 VALIDATION_SIZE = 10000
@@ -28,6 +26,7 @@ test_images = scipy.io.loadmat(DIGIT_DIR+"test")['test_images'].transpose([2,0,1
 flat = train_images.ravel().reshape((N_SAMPLES, IMG_SIZE))
 
 
+# Problem 1 & 2
 def trainValidateSVM(n, cv=1.0):
     clf = svm.SVC(C=cv, kernel='linear')
     print clf
@@ -70,6 +69,7 @@ def trainValidateSVM(n, cv=1.0):
     plt.draw()
     return accuracy
 
+# Problem 3
 # C value for 'Penalty parameter C of the error term' in SVC
 # Defaults to 1.0
 def tenFold(c=1.0):
@@ -108,6 +108,7 @@ def tenFold(c=1.0):
     average = sum(values) / len(values)
     return average
 
+# Problem 3
 def test(n, c=1.0):
     clf = svm.SVC(kernel='linear', C=c)
     TRAIN_SIZE = n
@@ -123,7 +124,6 @@ def test(n, c=1.0):
     prediction = clf.predict(test_images)
     print prediction
     print len(prediction)
-    import csv
     with open('results.csv', 'wb') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Id', 'Category'])
