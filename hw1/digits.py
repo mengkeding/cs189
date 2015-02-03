@@ -29,7 +29,7 @@ flat = train_images.ravel().reshape((N_SAMPLES, IMG_SIZE))
 # Problem 1 & 2
 def trainValidateSVM(n, cv=1.0):
     clf = svm.SVC(C=cv, kernel='linear')
-    print clf
+    #print clf
     TRAIN_SIZE = n
 
     # Partition Training Set
@@ -132,7 +132,7 @@ def test(n, c=1.0):
 
 
 
-#sample_sizes = [100, 200, 500, 1000, 5000, 10000]
+#sample_sizes = [100, 200, 500, 1000, 2000, 5000, 10000]
 #for n in sample_sizes:
 #    print "Score for "+str(n)+": "+str(trainValidateSVM(n)*100)+"%"
 
@@ -153,10 +153,10 @@ def test(n, c=1.0):
 #print "Best C: "+str(c_values[index])
 #print "Best Average: "+str(value)
 
-#print str(trainValidateSVM(20000, 1e-05)*100)+"%"
-start = time.time()
-test(30000, 1e-05)
-end = time.time()
-print str(end - start)
-
+print str(trainValidateSVM(10000, 1e-05)*100)+"%"
+#start = time.time()
+#test(30000, 1e-05)
+#end = time.time()
+#print str(end - start)
+#
 plt.show()

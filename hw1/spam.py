@@ -18,7 +18,7 @@ N_SAMPLES = 5172
 VALIDATION_SIZE = 1000
 
 # Trains and Validates Spam Classifier: Problem 4
-def trainValidate(n, c=1.0):
+def trainValidate(n, c=0.1):
     clf = svm.SVC(C=c, kernel='linear')
     TRAIN_SIZE = n
     indices = random.sample(xrange(len(training_data)), TRAIN_SIZE)
@@ -87,9 +87,9 @@ def test(n, c=1.0):
             writer.writerow([i+1, prediction[i]])
 
 
-#training_sizes = [ 10, 50, 100, 1000, 2000, 5000]
-#for n in training_sizes:
-#    print "Training Size: "+str(n)+" Accuracy: "+str(trainValidate(n)*100)+"%"
+training_sizes = [ 10, 50, 100, 1000, 2000, 5000]
+for n in training_sizes:
+    print "Training Size: "+str(n)+" Accuracy: "+str(trainValidate(n)*100)+"%"
 
 #c_values = [ pow(10, x) for x in range(-5,6) ]
 #averages = []
