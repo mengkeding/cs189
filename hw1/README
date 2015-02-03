@@ -1,0 +1,41 @@
+Name: David Wu
+SID: 22934420
+Instructions:
+
+Requires scikit-learn, numpy, scipy.io, and matplotlib
+
+digits.py is the file for digits classification
+You can change variables at the top of the file to change validation and test sizes
+File contains 3 functions:
+
+testValidateSVM takes 2 parameters: n and optional parameter cv
+n determines training size and cv is the c value (default 1.0)
+This function trans and validates an SVM by randomly sampling the given data
+This function also draws the confusion matrix. Do not remove the plt.show() at the bottom of the file
+Returns accuracy as a decimal
+
+tenFold takes an optional parameter c (c value default 1.0)
+performs k-fold validation where k=10
+Returns the average accuracy as a decimal
+
+test takes parameter n and optional parameter c
+n is the training size and c is the c value (defaul 1.0)
+test trains on the given training data then predicts on the kaggle test values
+writes to a csv called "results.csv"
+
+
+spam.py is the file for spam classification
+File contains 3 functions:
+
+trainValidate takes parameter n and optional parameter c
+n is the training size and c is the c value (defaul 1.0)
+Returns accuracy as a decimal
+
+tenFold takes an optional parameter c (c value default 1.0)
+performs k-fold validation where k=10
+Returns the average accuracy as a decimal
+
+test takes parameter n and optional parameter c
+n is the training size and c is the c value (defaul 1.0)
+test trains on the given training data then predicts on the kaggle test values
+writes to a csv called "spam.csv"
