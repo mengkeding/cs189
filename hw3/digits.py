@@ -1,12 +1,9 @@
-import time
 import scipy.io
 import numpy as np
 import random
-import operator
 import csv
 from collections import defaultdict
-import scipy.stats
-#from scipy.stats import multivariate_normal
+from scipy.stats import multivariate_normal
 import matplotlib.pyplot as plt
 
 
@@ -53,11 +50,12 @@ for img, label in zip(X, y):
 covariances = defaultdict(int)
 means = defaultdict(int)
 # Get means and covariances matricies for each class
+alpha = 1e-5
 for label in images:
     v = np.array(images[label])
     cov = np.cov(v.T)
     mean = np.mean(v, axis=0)
-    covariances[label] = cov
+    covariances[label] = cov + alpha * np.identity(784)
     means[label] = mean
 
 priors = defaultdict(int)
@@ -71,15 +69,35 @@ for label in images:
 #    plt.title("Class Label: "+str(label))
 #    plt.show()
 
-#s_overall = np.mean(covariances.values(), axis=0)
-#gaussians = []
-#for label in means:
-#    gaussians.append(multivariate_normal(mean=means[label], cov=s_overall), label)
+#alpha = 1e-5 * np.identity(784)
+s_overall = np.mean(covariances.values(), axis=0) #+ alpha
 
-for label, img in zip(test_labels, test_images):
+gaussians = []
+for label in means:
+    gaussians.append((multivariate_normal(mean=means[label], cov=s_overall), label))
+
+count = 0
+for true_label, img in zip(test_labels, test_images):
     img = img.astype('uint64')
     img = img / np.sqrt(img.dot(img))
-    rv, label = max(rvs, key=lambda rv, label: rv.pdf(img))
-    import pdb; pdb.set_trace()
-    pass
+    _, label = max(gaussians, key=lambda gaussian: gaussian[0].logpdf(img))
+    if label == true_label:
+        count += 1
+accuracy = count / float(len(test_images))
+print "Accuracy: " + str(accuracy*100) + "%"
+
+kaggle_images = scipy.io.loadmat(DATA_DIR+"kaggle")['kaggle_image'].transpose([2,0,1]).ravel().reshape((TEST_SIZE, IMG_SIZE))
+#import pdb; pdb.set_trace()
+
+with open('results_digits.csv', 'wb') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Id', 'Category'])
+    count = 1
+    for img in kaggle_images:
+        img = img.astype('uint64')
+        img = img / np.sqrt(img.dot(img))
+        _, label = max(gaussians, key=lambda gaussian: gaussian[0].logpdf(img))
+        writer.writerow([count, label])
+        count += 1
+print "Done"
 
