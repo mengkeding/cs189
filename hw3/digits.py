@@ -5,6 +5,9 @@ import random
 import operator
 import csv
 from collections import defaultdict
+import scipy.stats
+#from scipy.stats import multivariate_normal
+import matplotlib.pyplot as plt
 
 
 # Variables
@@ -17,24 +20,35 @@ IMG_SIZE = 28*28 # known image size
 VALIDATION_SIZE = 10000
 N_SAMPLES = 60000
 TEST_SIZE = 5000
+TRAIN_SIZE = 60000
 
 # Load Training Set
 train = scipy.io.loadmat(DATA_DIR+"train")
 train_labels = train['train_label']
 train_images = train['train_image'].transpose([2,0,1])
 test_images = scipy.io.loadmat(DATA_DIR+"test")['test_image'].transpose([2,0,1]).ravel().reshape((TEST_SIZE, IMG_SIZE))
+test_labels = scipy.io.loadmat(DATA_DIR+"test")['test_label']
 
 # Flatten Training Set
 flat = train_images.ravel().reshape((N_SAMPLES, IMG_SIZE))
 
+# Partition Training Set
+index = random.sample(xrange(len(flat)), TRAIN_SIZE)
+X = []
+y = []
+for i in index:
+    X.append(flat[i])
+    y.append(train_labels[i][0])
+X = np.array(X)
+y = np.array(y).reshape(len(y), 1)
+
 # Bucket the images into labels
 images = defaultdict(list)
-for img, label in zip(flat, train_labels):
+for img, label in zip(X, y):
     img = img.astype("uint64")
     # Normalize
     norm = np.linalg.norm(img)
     images[label[0]].append(img / norm)
-    import pdb; pdb.set_trace()
 
 covariances = defaultdict(int)
 means = defaultdict(int)
@@ -46,5 +60,26 @@ for label in images:
     covariances[label] = cov
     means[label] = mean
 
+priors = defaultdict(int)
+for label in images:
+    priors[label] = len(images[label]) / float(N_SAMPLES)
 
+#for label in covariances:
+#    cov = covariances[label]
+#    plt.imshow(cov)
+#    plt.colorbar()
+#    plt.title("Class Label: "+str(label))
+#    plt.show()
+
+#s_overall = np.mean(covariances.values(), axis=0)
+#gaussians = []
+#for label in means:
+#    gaussians.append(multivariate_normal(mean=means[label], cov=s_overall), label)
+
+for label, img in zip(test_labels, test_images):
+    img = img.astype('uint64')
+    img = img / np.sqrt(img.dot(img))
+    rv, label = max(rvs, key=lambda rv, label: rv.pdf(img))
+    import pdb; pdb.set_trace()
+    pass
 
