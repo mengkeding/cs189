@@ -1,0 +1,24 @@
+Name: David Wu
+SID: 22934420
+Instructions:
+
+Requires numpy, scipy (0.15+), and matplotlib
+
+hw3_1.py is for question 1
+hw3_3.py is for question 3
+digits.py is the file for digits classification
+spam.py is the file for spam classification
+
+You can run each file with:
+python filename
+
+Each file goes in the order of the questions.
+
+Running hw3_1.py will display the two dimensional grid, followed by the rotated grid
+hw3_3.py will draw the isocontours for each function
+digits.py will print the accuracy and write the kaggle results to results_digits.csv. The covariance visualizations are currently commented out
+spam.py will print the accuracy and write the kaggle results to results_spam.csv
+
+if pdb launches in any code, simply comment out the following line:
+
+import pdb; pdb.set_trace()
