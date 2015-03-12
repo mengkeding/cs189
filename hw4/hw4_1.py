@@ -6,7 +6,6 @@ import pdb
 
 # X and Beta are numpy matrices
 def calculate_mu(X, beta):
-    #exp = np.vectorize(math.exp)
     mu = 1.0 / (1 + np.vectorize(math.exp)(-1 * X * beta ))
     return mu
 
