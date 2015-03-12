@@ -9,13 +9,12 @@ def calculate_mu(X, beta):
     mu = 1.0 / (1 + np.vectorize(math.exp)(-1 * X * beta ))
     return mu
 
-def diag(mu):
-    ones = np.ones((len(mu), 1))
-    retval = np.diagflat((ones - mu).T) * mu
-    return np.diagflat(retval)
-
 def update_beta(X, Y, beta, L):
     mu = calculate_mu(X, beta)
+    def diag(mu):
+        ones = np.ones((len(mu), 1))
+        retval = np.diagflat((ones - mu).T) * mu
+        return np.diagflat(retval)
     A = diag(mu)
     identity = np.identity(len(beta))
     new_beta = beta - inv(2*L*identity - X.T * A * X) * (2*L*beta - X.T*(Y-mu))
