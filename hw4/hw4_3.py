@@ -5,8 +5,6 @@ import math
 
 import pdb
 
-
-
 DATA_DIR="/Users/David/Documents/School/CS189/hw4/"
 data = scipy.io.loadmat(DATA_DIR+"spam")
 
@@ -30,9 +28,8 @@ xTrain3 = preprocess3(xTrain)
 xTest3 = preprocess3(xTest)
 
 def calculate_mu(X, beta):
-    mu = 1.0 / (1 + np.vectorize(math.exp)(-1 * X * beta ))
+    mu = 1.0 / (1.0 + np.vectorize(math.exp)(-1.0 * X * beta ))
     return mu
-
 
 def update_beta(X, Y, beta, L, eta, stochastic=False):
     if not stochastic:
@@ -43,15 +40,15 @@ def update_beta(X, Y, beta, L, eta, stochastic=False):
         Xi = X[i]
         Yi = Y[i]
         mu = calculate_mu(Xi, beta)
-        new_beta = beta - eta * (Yi - mu).T * Xi
+        new_beta = beta - eta * (2*L*beta - Xi.T * (Yi - mu))
     return new_beta
 
 def training_loss(X, Y, beta):
-    total_loss = 0
+    total_loss = 0.0
     for i in range(len(X)):
         mu = calculate_mu(X[i], beta)
-        total_loss += Y[i] * math.log(mu) + (1 - Y[i]) * math.log(1-mu)
-    return -1.0*float(total_loss)
+        total_loss += -1.0 * (Y[i] * math.log(mu) + (1 - Y[i]) * math.log(1-mu))
+    return float(total_loss)
 
 def batch_gradient(X, Y):
     L = 1e-6
@@ -68,44 +65,40 @@ def batch_gradient(X, Y):
             losses.append(training_loss(X, Y, beta))
         if change < 1e-6:
             break
-        #print losses[-1]
     plt.plot(list(range(0, len(losses)*10, 10)), losses)
     plt.show()
-    print "done"
     return beta
 
 def stochastic_gradient(X, Y, variable=False):
     L = 1e-6
     eta = 1e-5
+    constant_eta = 1e-5
     # Initialize beta to be zeros
     beta = np.mat(np.zeros(xTrain.shape[1])).T
     change = float("inf")
     losses = []
     for i in range(STO_MAX_ITERATIONS):
         if variable:
-            eta = eta / float(i+1)
+            eta = constant_eta / float(i+1)
         prev = beta
         beta = update_beta(X, Y, beta, L, eta, stochastic=True)
         change = np.linalg.norm(prev - beta)
         if i % 100 == 0:
             losses.append(training_loss(X, Y, beta))
         if change < 1e-10:
-            print "done"
             break
-        #print losses[-1]
-    print "done"
-    plt.plot(list(range(0, len(losses)*10, 10)), losses)
+    plt.plot(list(range(0, len(losses)*100, 100)), losses)
     plt.show()
     return beta
 
 batch_beta1 = batch_gradient(xTrain1, yTrain)
-#batch_beta2 = batch_gradient(xTrain2, yTrain)
-#batch_beta3 = batch_gradient(xTrain3, yTrain)
-#
-#sto_beta1 = stochastic_gradient(xTrain1, yTrain)
-#sto_beta2 = stochastic_gradient(xTrain2, yTrain)
-#sto_beta3 = stochastic_gradient(xTrain3, yTrain)
-#
-#varLearning_beta1 = stochastic_gradient(xTrain1, yTrain, variable=True)
+batch_beta2 = batch_gradient(xTrain2, yTrain)
+batch_beta3 = batch_gradient(xTrain3, yTrain)
 
-pdb.set_trace()
+sto_beta1 = stochastic_gradient(xTrain1, yTrain)
+sto_beta2 = stochastic_gradient(xTrain2, yTrain)
+sto_beta3 = stochastic_gradient(xTrain3, yTrain)
+
+varLearning_beta1 = stochastic_gradient(xTrain1, yTrain, variable=True)
+varLearning_beta2 = stochastic_gradient(xTrain2, yTrain, variable=True)
+varLearning_beta3 = stochastic_gradient(xTrain3, yTrain, variable=True)
