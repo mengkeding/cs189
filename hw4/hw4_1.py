@@ -29,7 +29,7 @@ X = np.mat( [[0, 3],
 # Append 1 to x_i vectors
 ones = np.ones(len(X))
 X = np.hstack([X, np.mat(ones).T])
-
+#pdb.set_trace()
 Y = np.mat( [[1],
             [1],
             [0],
