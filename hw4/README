@@ -1,0 +1,16 @@
+To run each:
+
+Change DATA_DIR to directory with 'YearPredictionMSD.txt' and spam.mat
+
+
+Run for each problem:
+
+python hw4_1.py
+python hw4_2.py
+python hw4_3.py
+
+
+
+Requires numpy, scipy.io, and matplotlib
+If pdb goes off, just get rid off anylines that say pdb.set_trace()
+If graphs are commented out, just uncomment plt.show()
