@@ -32,10 +32,12 @@ RSS = np.asarray(0.5 * (RES.T * RES))[0][0]
 
 
 print "RSS:" + str(RSS)
+print "Max:" + str(max(calc_labels))
+print "Min:" + str(min(calc_labels))
 
 #pdb.set_trace()
 
-plt.stem(np.asarray(beta).T[0])
-plt.show()
+#plt.stem(np.asarray(beta).T[0])
+#plt.show()
 
 
