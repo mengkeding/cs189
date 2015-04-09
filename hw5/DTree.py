@@ -2,6 +2,7 @@ import math
 import random
 from Node import *
 import numpy as np
+from collections import Counter
 
 class DTree:
     def __init__(self, depth, impurity, segmentor):
@@ -43,7 +44,17 @@ class DTree:
 
 
     def chooseBestAttribute(self, S):
-        raise NotImplementedError
+        S_0 = filter(lambda tup: tup[0] == 0, S)
+        S_1 = filter(lambda tup: tup[0] == 1, S)
+        counter0 = Counter(map(lambda tup: tup[1], S_0))
+        counter1 = Counter(map(lambda tup: tup[1], S_0))
+        y_0 = counter0.most_common(1)[0][0]
+        y_1 = counter1.most_common(1)[0][0]
+        J_0 = filter(lambda tup: tup[0] == 0, counter0)[0][1]
+        J_1 = filter(lambda tup: tup[0] == 1, counter0)[0][1]
+        total_error = J_0 + J_1
+
+
 
     def calculateEntropy(self, S):
         ones = sum([x[1] for x in S])
