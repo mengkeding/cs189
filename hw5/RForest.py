@@ -46,11 +46,3 @@ class RForest():
             # Returns most frequent label
             return max(count.iteritems(), key=operator.itemgetter(1))[0]
         return np.array(map(traverse, data))
-
-
-
-
-
-
-
-
