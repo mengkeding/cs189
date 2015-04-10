@@ -5,11 +5,12 @@ class Segmentor():
         self.left = None
         self.right = None
 
-    def split(self, data, labels, impurity):
+    def split(self, data, labels, impurity, features=None):
         # change splits for different splits
         splits = np.mean(data, 0)
         bestRule, bestFeature, bestLeft, bestRight, bestError = None, None, None, None, 1.0
-        for feature in range(data.shape[1]):
+        features = features if features else list(range(data.shape[1]))
+        for feature in features:
             threshold = splits[feature]
             leftIndex, rightIndex = [], []
             leftHist, rightHist = { 0 : 0, 1 : 0 }, { 0 : 0, 1 : 0 }
