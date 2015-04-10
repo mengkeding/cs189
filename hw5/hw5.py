@@ -30,7 +30,7 @@ xTest = data['test_data']
 segmentor = Segmentor()
 
 print "============= Decision Tree =========="
-tree = DTree(Impurity.impurity, segmentor)
+tree = DTree(Impurity.impurity, segmentor, depth=20)
 tree.train(xTrain, yTrain)
 labels = tree.predict(xValidate)
 
@@ -49,7 +49,7 @@ forest = RForest(Impurity.impurity, segmentor, nTrees=30, randomness=10)
 forest.train(xTrain, yTrain)
 labels = forest.predict(xValidate)
 
-counts = np.bincount(tree.predict(xTrain) == yTrain)
+counts = np.bincount(forest.predict(xTrain) == yTrain)
 error = 1.0 - (counts[True] / float(counts[True] + counts[False]))
 print "Training Error: %f" % (error)
 
@@ -57,9 +57,9 @@ counts = np.bincount(labels == yValidate)
 error = 1.0 - (counts[True] / float(counts[True] + counts[False]))
 print "Validation Error: %f" % (error)
 
-#prediction = tree.predict(xTest)
-#with open('results.csv', 'wb') as csvfile:
-#    writer = csv.writer(csvfile)
-#    writer.writerow(['Id', 'Category'])
-#    for i in range(len(prediction)):
-#        writer.writerow([i+1, prediction[i]])
+prediction = forest.predict(xTest)
+with open('results.csv', 'wb') as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow(['Id', 'Category'])
+    for i in range(len(prediction)):
+        writer.writerow([i+1, prediction[i]])

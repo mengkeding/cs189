@@ -1,0 +1,7 @@
+Run with:
+python hw5.py
+
+Uses numpy and scipy.io
+Change the DATA_DIR variable in hw5.py to the directory with the spam dataset
+
+Make sure all the *.py files are in the same directory
