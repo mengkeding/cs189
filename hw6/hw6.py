@@ -1,3 +1,4 @@
+from NeuralNetwork import *
 import scipy.io
 import numpy as np
 
@@ -44,6 +45,9 @@ yTrain = np.array(tmp)
 tmp = []
 for i in range(len(yValidate)):
     tmp.append(transform_y(yValidate[i]))
+
+# Create Neural Network
+net = NeuralNetwork()
 
 import pdb; pdb.set_trace()
 

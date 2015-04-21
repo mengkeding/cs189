@@ -10,15 +10,15 @@ class NeuralNetwork():
         self.output_layer_size = 10
 
         # Weights
-        self.W1 = np.random.randn(self.input_layer_size, self.hidden_layer_size)
-        self.W2 = np.random.randn(self.hidden_layer_size, self.output_layer_size)
+        self.W1 = np.random.randn(self.input_layer_size+1, self.hidden_layer_size)
+        self.W2 = np.random.randn(self.hidden_layer_size+1, self.output_layer_size)
 
     def forward(self, X):
         # Propagate inputs forward through network
-        self.z2 = np.dot(X, self.W1)
-        self.a2 = self.tanh(self.z2)
-        self.z3 = np.dot(self.a2, self.W2)
-        self.yHat = self.sigmoid(self.z3)
+        self.z2 = np.dot(X, self.W1[:-1])
+        self.a2 = self.tanh(self.z2 + np.ones(self.z2.shape) * self.W1[-1])
+        self.z3 = np.dot(self.a2, self.W2[:-1])
+        self.yHat = self.sigmoid(self.z3 + np.ones(self.z3.shape) * self.W2[-1])
         return self.yHat
 
     def costFunction(self, X, y):
@@ -47,5 +47,3 @@ class NeuralNetwork():
 
     def tanh_derivative(self, x):
         return 1 - tanh(x)**2
-
-import pdb; pdb.set_trace()
