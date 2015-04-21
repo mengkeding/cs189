@@ -3,26 +3,30 @@ import random
 
 class NeuralNetwork():
     # Initialize Neural Network
-    """
-    Sizes is a list of sizes for each layer
-    Ex. neural_network = NeuralNetwork([784, 200, 10])
-    784 input, 200 hidden, 10 output
-    randomizes biases and weights on initialization
-    """
     def __init__(self, sizes):
-        self.num_layers = len(sizes)
-        self.sizes = sizes
-        self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
-        self.weights = [np.random.randn(y, x) for x, y in zip(sizes[:-1], sizes[1:])]
+        self.input_layer_size = 784
+        self.hidden_layer_size = 200
+        self.output_layer_size = 10
 
-    def forward_pass(self, a):
-        sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
-        for bias, weight in zip(self.biases, self.weights):
-            a = np.vectorize(sigmoid)(np.dot(weight, a) + bias)
-        return a
+    def sigmoid(self, x):
+        return 1.0 / (1.0 + np.exp(-x))
 
-    def SGD(self, xTrain, yTrain):
-        training_data = [ (xTrain[i], yTrain[i]) for i in range(len(yTrain)) ] # list of (x, y)
+    def tanh(self, x):
+        return np.tanh(x)
 
-tmp = NeuralNetwork([784, 200, 10])
+    def sigmoid_derivative(self, x):
+        return sigmoid(x) * (1.0 - sigmoid(x))
+
+    def tanh_derivative(self, x):
+        return 1 - tanh(x)**2
+
+    #def forward_pass(self, a):
+    #    sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
+    #    for bias, weight in zip(self.biases, self.weights):
+    #        a = np.vectorize(sigmoid)(np.dot(weight, a) + bias)
+    #    return a
+
+    #def SGD(self, xTrain, yTrain):
+    #    training_data = [ (xTrain[i], yTrain[i]) for i in range(len(yTrain)) ] # list of (x, y)
+
 import pdb; pdb.set_trace()
