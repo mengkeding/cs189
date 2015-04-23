@@ -1,13 +1,12 @@
 import scipy.io
 import numpy as np
-import random
 
 import pdb
 
 IMG_SIZE = 28*28
 N_SAMPLES = 60000
 TEST_SIZE = 10000
-VALIDATION_SIZE = 10000
+VALIDATION_SIZE = 50000
 
 class NeuralNetwork():
     # Initialize Neural Network
@@ -19,11 +18,9 @@ class NeuralNetwork():
         # Weights are None since untrained
         self.W1 = None
         self.W2 = None
-        # Uncomment to test backwards prop
-        #self.W1 = np.random.randn(self.input_layer_size+1, self.hidden_layer_size)
-        #self.W2 = np.random.randn(self.hidden_layer_size+1, self.output_layer_size)
-
-        # Error Function
+        # Learning Rate
+        self.eta = None
+        # TODO: below
         # Use Entropy if True else mean squared
         self.entropy = entropy
 
@@ -39,74 +36,70 @@ class NeuralNetwork():
         LOWER_BOUND = -1.0
         self.W1 = (UPPER_BOUND - LOWER_BOUND) * np.random.randn(self.input_layer_size+1, self.hidden_layer_size) + LOWER_BOUND
         self.W2 = (UPPER_BOUND - LOWER_BOUND) * np.random.randn(self.hidden_layer_size+1, self.output_layer_size) + LOWER_BOUND
-
+        self.eta = eta
 
         # Pad for bias
         X = np.hstack((X, np.ones((X.shape[0], 1))))
         y_labels = y
         # Transform Y
-        transform_y = lambda digit: np.identity(10)[digit]
-        tmp = []
-        for i in range(len(y)):
-            tmp.append(transform_y(y[i]))
-        y = np.array(tmp)
+        def transform_y(digit):
+            vector = np.zeros(10)
+            vector[digit] = 1
+            return vector
 
         for iteration in range(maxiter):
-            # Random index to split training set for validation
-            self.randomIndex = np.random.choice(N_SAMPLES, N_SAMPLES, replace=False)
-            # Split Data
-            train_images = X[self.randomIndex[:-VALIDATION_SIZE]]
-            train_labels = y[self.randomIndex[:-VALIDATION_SIZE]]
-            validation_images = X[self.randomIndex[-VALIDATION_SIZE:]]
-            validation_labels = y[self.randomIndex[-VALIDATION_SIZE:]]
-            y_labels = y_labels[net.randomIndex[:]]
-
-            # Forward Pass
-            _ = self.forward(train_images)
-            # Calculate cost/loss
-            cost = self.costFunction(train_images, train_labels)
-            #pdb.set_trace()
-            # G: input gradient      g: output gradient
-            G, g = self.backwards(train_images, train_labels)
-            self.W1 -= eta*G
-            self.W2 -= eta*g
-            # For Testing
-            #if iteration % 1000 == 0:
             print "Iteration: %d" % (iteration)
-            predicted = self.predict(X)
-            incorrect = np.count_nonzero(y_labels - predicted)
-            accuracy = (predicted.shape[0] - incorrect) / float(predicted.shape[0])
-            print "Training Accuracy: %f" % accuracy
-            #print "Iteration: %d" % (iteration)
+
+            # Random index to split training set for validation
+            self.randomIndex = np.random.choice(X.shape[0], X.shape[0], replace=False)
+
+            for i in self.randomIndex[:10000]:
+                ## Select a data point
+                image = X[i]
+                label = transform_y(y[i])
+                # Forward Pass
+                hidden, prediction = self.forward(image)
+                # Backward Pass
+                # Stochastic Gradient Descent
+                dJdW2, dJdW1 = self.backwards(image, label, prediction, hidden)
+
+            # Get training accuracy every 5 iterations
+            if iteration % 5 == 0:
+                predicted = self.predict(X)
+                incorrect = np.count_nonzero(y - predicted)
+                accuracy = (predicted.shape[0] - incorrect) / float(predicted.shape[0])
+                print "Training Accuracy: %f" % accuracy
         return self.W1, self.W2
 
     def predict(self, X):
+        # Propagate inputs forward through network
         if (self.W1 is not None) and (self.W2 is not None):
-            probability = self.forward(X)
-            labels = np.argmax(probability, axis=1)
-            return labels
+            yHat = []
+            for image in X:
+                z2 = np.dot(self.W1.T, image)
+                a2 = np.append(self.tanh(z2), 1)
+                z3 = np.dot(self.W2.T, a2)
+                yHat.append(np.argmax(self.sigmoid(z3)))
+            self.yHat = np.array(yHat)
+            return self.yHat
         else:
             return None
 
     def forward(self, X):
-        # Propagate inputs forward through network
-        self.z2 = np.dot(X, self.W1)
-        self.a2 = self.tanh(self.z2) #Hidden Layer Activation
-        self.a2 = np.hstack((self.a2, np.ones((self.a2.shape[0], 1))))
-        self.z3 = np.dot(self.a2, self.W2)
-        self.yHat = self.sigmoid(self.z3)
-        return self.yHat
+        z2 = np.dot(self.W1.T, X)
+        a2 = np.append(self.tanh(z2), 1)
+        z3 = np.dot(self.W2.T, a2)
+        yHat = self.sigmoid(z3)
+        return a2, yHat
 
-    #TODO: Fix this shit here
-    def backwards(self, X, y):
-        #self.yHat = self.forward(X)
-        # Output to Hidden
-        delta3 = np.multiply(-(y - self.yHat), self.sigmoid_derivative(self.z3))
-        dJdW2 = np.dot(self.a2.T, delta3)
-        # Hidden to Input
-        delta2 = np.dot(delta3, self.W2[:-1].T) * self.tanh_derivative(self.z2)
-        dJdW1 = np.dot(X.T, delta2)
-        return dJdW1, dJdW2
+    def backwards(self, x, y, yHat, a2):
+        delta3 = np.multiply(-(y - yHat), self.sigmoid_derivative(yHat))
+        dJdW2 = np.outer(delta3, a2).T
+        self.W2 -= (self.eta*dJdW2)
+        delta2 = np.dot(self.W2, delta3) * self.tanh_derivative(a2)
+        dJdW1 = np.outer(delta2[:-1], x).T
+        self.W1 -= (self.eta*dJdW1)
+        return dJdW2, dJdW1
 
     def costFunction(self, X, y, flag=False):
         if flag == True:
@@ -136,7 +129,7 @@ class NeuralNetwork():
         return self.sigmoid(x) * (1.0 - self.sigmoid(x))
 
     def tanh_derivative(self, x):
-        return 1 - self.tanh(x)**2
+        return 1 - np.square(self.tanh(x))
 
 ####################################################
 DATA_DIR="/Users/David/dev/cs189/hw6/digit-dataset/"
@@ -144,19 +137,20 @@ train_data = scipy.io.loadmat(DATA_DIR+"train.mat")
 test_data = scipy.io.loadmat(DATA_DIR+"test.mat")
 
 # Load Data
-X = train_data['train_images'].transpose([2,0,1]).ravel().reshape((N_SAMPLES, IMG_SIZE)).astype(float)
+X = train_data['train_images'].transpose().ravel().reshape((N_SAMPLES, IMG_SIZE)).astype(float)
 Y = train_data['train_labels'].ravel()
 
 # TODO: Pick preprocessing
-xTrain = (X - np.mean(X, axis=0)) / (np.std(X, axis=0) + 1e-6)
+xTrain = (X - np.mean(X, axis=0)) / (np.std(X, axis=0) + 1e-9)
 yTrain = Y
 #X /= 256.0
 import pdb; pdb.set_trace()
 
-
 # Create Neural Network
 net = NeuralNetwork()
-net.train(xTrain, yTrain, 1e-9, maxiter=10000)
+w1, w2 = net.train(xTrain, yTrain, 1e-4, maxiter=10000)
+np.save("w1", w1)
+np.save("w2", w2)
 #validate_labels = net.predict(xValidate)
 pdb.set_trace()
 #net.backwards(xTrain, yTrain)
