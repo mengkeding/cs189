@@ -1,0 +1,11 @@
+Run with command
+
+python NeuralNetwork.py
+
+change DATA_DIR variable to the directory with *.mat files
+
+Requires numpy, scipy.io to run.
+matplotlib  is required for graphing
+
+Code prints iterations and training accuracy at every 1000 iterations
+
