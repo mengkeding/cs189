@@ -1,5 +1,6 @@
 import scipy.io
 import numpy as np
+import matplotlib.pyplot as plt
 import csv
 
 import pdb
@@ -40,6 +41,9 @@ class NeuralNetwork():
 
         #self.W1 = np.random.normal(loc=0, scale=0.01, size=(self.input_layer_size+1, self.hidden_layer_size))
         #self.W2 = np.random.normal(loc=0, scale=0.01, size=(self.hidden_layer_size+1, self.output_layer_size))
+        iteration_plot = []
+        accuracy_plot = []
+        error_plot = []
 
 
         # Learning Rate
@@ -53,37 +57,39 @@ class NeuralNetwork():
             vector[digit] = 1
             return vector
         num = 0
+        self.randomIndex = np.random.choice(X.shape[0], maxiter, replace=True)
+        for i in self.randomIndex:
+            ## Select a data point
+            image = X[i]
+            label = transform_y(y[i])
+            # Forward Pass
+            hidden, prediction = self.forward(image)
+            # Backward Pass & Stochastic Gradient Descent
+            dJdW2, dJdW1 = self.backwards(image, label, prediction, hidden)
 
-        for iteration in range(maxiter):
-
-            # Random index to split training set for validation
-            self.randomIndex = np.random.choice(X.shape[0], X.shape[0], replace=True)
-
-            for i in self.randomIndex:
-                ## Select a data point
-                image = X[i]
-                label = transform_y(y[i])
-                # Forward Pass
-                hidden, prediction = self.forward(image)
-                # Backward Pass & Stochastic Gradient Descent
-                dJdW2, dJdW1 = self.backwards(image, label, prediction, hidden)
-
-                # Get training accuracy every 1000 iterations
-                if num % 1000 == 0 or num == maxiter-1:
-                    predicted = self.predict(X)
-                    incorrect = np.count_nonzero(y - predicted)
-                    accuracy = (predicted.shape[0] - incorrect) / float(predicted.shape[0])
+            # Get training accuracy every 1000 iterations
+            if num % 1000 == 0 or num == maxiter-1:
+                predicted = self.predict(X)
+                incorrect = np.count_nonzero(y - predicted)
+                accuracy = (predicted.shape[0] - incorrect) / float(predicted.shape[0])
+                np.save("w1", self.W1)
+                np.save("w2", self.W2)
+                print "Iteration: %d" % (num)
+                print "Training Accuracy: %f" % (accuracy)
+                #iteration_plot.append(num)
+                #accuracy_plot.append(accuracy)
+                #error_plot.append(0.5*sum(y - predicted)**2)
+                if accuracy > 0.95:
                     np.save("w1", self.W1)
                     np.save("w2", self.W2)
-                    print "Iteration: %d" % (num)
-                    print "Training Accuracy: %f" % (accuracy)
-                    if accuracy > 0.95:
-                        np.save("w1", self.W1)
-                        np.save("w2", self.W2)
-                        return self.W1, self.W2
-                num += 1
-            if num > maxiter:
-                break
+                    return self.W1, self.W2
+            num += 1
+        #pdb.set_trace()
+        #plt.plot(iteration_plot, error_plot)
+        #plt.xlabel('Iterations')
+        #plt.ylabel('Error')
+        #plt.title('Iterations vs. Error')
+        #plt.show()
         return self.W1, self.W2
 
     def predict(self, X, pad=False):
@@ -188,7 +194,7 @@ yTrain = Y
 # Create Neural Network
 net = NeuralNetwork()
 #net = NeuralNetwork(entropy=True)
-w1, w2 = net.train(xTrain, yTrain, 0.1, maxiter=700000)
+w1, w2 = net.train(xTrain, yTrain, 1e-1, maxiter=40000)
 np.save("w1", w1)
 np.save("w2", w2)
 #validate_labels = net.predict(xValidate)
