@@ -85,7 +85,7 @@ class KMeans():
     def visualize(self):
         for i in range(self.k):
             image = self.centroids[i].reshape((28, 28))
-            imgplot = plt.imshow(image, cmap=cm.Greys_r)
+            imgplot = plt.imshow(image, cmap=cm.Greys)
             plt.show()
 
 pdb.set_trace()
