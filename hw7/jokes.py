@@ -51,7 +51,10 @@ print "Validation Accuracy: %f" % (accuracy)
 def euclidian_distance(user1, user2):
     return np.linalg.norm(user1 - user2)
 
-def kneighbors_recommendation(k):
+# DO NOT USE
+# Calculates kneighbors for all users
+# Incredibly slow
+def kneighbors_recommendation_full(k):
     neighbors = []
     recommendations = []
     for i in xrange(N_USERS):
@@ -74,17 +77,48 @@ def kneighbors_recommendation(k):
         recommendations.append(vector)
     return np.array(recommendations)
 
-ten_neighbors = kneighbors_recommendation(10)
+# Only compute neighbors for those in validation set
+def kneighbors_recommendation(k):
+    recommendations = {}
+    for index in range(len(validation_features)):
+        if index % 100 == 0:
+            print "Index %d / %d" % (index, len(validation_features))
+        user = validation_features[index][0]
+        user1 = train_data[user-1]
+        neighbors = []
+        # if computed, don't recompute
+        if user in recommendations.keys():
+            continue
+        else:
+            # Need to check all users
+            for i in xrange(N_USERS):
+                if user-1 == i:
+                    continue
+                user2 = train_data[i]
+                distance = euclidian_distance(user1, user2)
+                # Append index, distance
+                neighbors.append((i, distance))
+            # Sort by distance
+            neighbors = sorted(neighbors, key=lambda tup: tup[1])[:k]
+            vector = np.zeros(train_data[0].shape)
+            for i, d in neighbors:
+                vector = np.add(vector, train_data[i])
+            vector = np.divide(vector, float(k))
+            recommendations[user] = vector
+    return recommendations
+
+ten_neighbors = kneighbors_recommendation(1000)
+neighbors_labels = []
 for index in range(len(validation_features)):
     user, joke = average_validation[index]
-    if ten_neighbors[user-1][joke-1] > 0:
+    if ten_neighbors[user][joke-1] > 0:
         label = 1
     else:
         label = 0
     neighbors_labels.append([label])
 neighbors_labels = np.array(neighbors_labels)
 
-error = np.count_nonzeros(validation_labels - neighbors_labels) / float(len(validation_labels))
+error = np.count_nonzero(validation_labels - neighbors_labels) / float(len(validation_labels))
 accuracy = 1.0 - error
 print "==========K_NEIGHBORS AVERAGE RATING=========="
 print "Validation Accuracy: %f" % (accuracy)
