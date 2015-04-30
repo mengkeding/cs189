@@ -1,6 +1,7 @@
 import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import csv
 
 import pdb
@@ -13,7 +14,7 @@ N_SAMPLES = 60000
 DATA_DIR='/Users/David/dev/cs189/hw7/mnist_data/'
 data = scipy.io.loadmat(DATA_DIR+'images.mat')
 
-images = data['images'].transpose().reshape((N_SAMPLES, IMG_SIZE)).astype(float)
+images = data['images'].transpose([2, 0, 1]).reshape((N_SAMPLES, IMG_SIZE)).astype(float)
 
 class KMeans():
     # Initialize K Means
@@ -45,6 +46,8 @@ class KMeans():
                 break
             else:
                 print "===========WORSE============"
+            difference = abs(self.loss - tmp)
+            print "Difference: %f" % (difference)
             self.loss = tmp
             print "Loss: %f" % (self.loss)
             self.losses.append(self.loss)
@@ -80,9 +83,17 @@ class KMeans():
         for i in range(self.k):
             self.centroids[i] = np.mean(self.clusters[i], axis=0)
 
+    def visualize(self):
+        for i in range(self.k):
+            image = self.centroids[i].reshape((28, 28))
+            imgplot = plt.imshow(image, cmap=cm.Greys_r)
+            plt.show()
 
-
-5means = KMeans(images, 5)
-10means = KMeans(images, 10)
-20means = KMeans(images, 20)
 pdb.set_trace()
+
+#five = KMeans(images, 5)
+ten = KMeans(images, 10)
+#twenty = KMeans(images, 20)
+pdb.set_trace()
+#five.visualize()
+ten.visualize()
