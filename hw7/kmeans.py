@@ -2,7 +2,6 @@ import scipy.io
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import csv
 
 import pdb
 
@@ -38,7 +37,7 @@ class KMeans():
             print "Repicked clusters"
             tmp = self.objective_function()
             if tmp < self.loss:
-                #print "===========BETTER============"
+                print "===========BETTER============"
                 pass
             elif tmp == self.loss:
                 print "Converged"
@@ -91,9 +90,15 @@ class KMeans():
 
 pdb.set_trace()
 
-#five = KMeans(images, 5)
+five = KMeans(images, 5)
+print "Done with k=5"
 ten = KMeans(images, 10)
-#twenty = KMeans(images, 20)
+print "Done with k=10"
+twenty = KMeans(images, 20)
+print "Done with k=20"
 pdb.set_trace()
-#five.visualize()
+five.visualize()
+pdb.set_trace()
 ten.visualize()
+pdb.set_trace()
+twenty.visualize()
