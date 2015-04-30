@@ -51,48 +51,44 @@ print "Validation Accuracy: %f" % (accuracy)
 def euclidian_distance(user1, user2):
     return np.linalg.norm(user1 - user2)
 
-# TODO: optimize
-def kmeans_recommendation(k):
-    recommendation_matrix = []
-    for index in xrange(N_USERS):
-        if index % 100 == 0:
-            print "Index %d / %d" % (index, N_USERS)
-        neighbors = find_nearest_neighbors(index, k)
-        vector = np.zeros(train_data[index].shape)
-        while not neighbors.empty():
-            neighbor_index = neighbors.get()[1]
-            vector = np.add(vector, train_data[neighbor_index])
+def kneighbors_recommendation(k):
+    neighbors = []
+    recommendations = []
+    for i in xrange(N_USERS):
+        user1 = train_data[i]
+        user_distance = []
+        if i % 100 == 0:
+            print "Index %d / %d" % (i, N_USERS)
+        for j in xrange(N_USERS):
+            if j == i:
+                continue
+            user2 = train_data[j]
+            distance = euclidian_distance(user1, user2)
+            user_distance.append((j, distance))
+        neighbors.append(sorted(user_distance, key=lambda tup: tup[1])[:k])
+    for i in xrange(N_USERS):
+        vector = np.zeros(train_data[0].shape)
+        for user, distance in neighbors[i]:
+            vector = np.add(vector, train_data[user])
         vector = np.divide(vector, float(k))
-        recommendation_matrix.append(vector)
-    recommendation_matrix = np.array(vector)
-    return recommendation_matrix
+        recommendations.append(vector)
+    return np.array(recommendations)
 
+ten_neighbors = kneighbors_recommendation(10)
+for index in range(len(validation_features)):
+    user, joke = average_validation[index]
+    if ten_neighbors[user-1][joke-1] > 0:
+        label = 1
+    else:
+        label = 0
+    neighbors_labels.append([label])
+neighbors_labels = np.array(neighbors_labels)
 
-
-
-def find_nearest_neighbors(user_index, k):
-    user = train_data[user_index]
-    best = Queue.PriorityQueue(k)
-    for index in xrange(N_USERS):
-        # Skip self
-        if index == user_index:
-            continue
-        # Get negative distance between neighbors
-        distance = -euclidian_distance(user, train_data[index])
-        # if under k neighbors found, append to best
-        if not best.full():
-            best.put((distance, index))
-        # check if you beat any
-        else:
-            worst = best.get()
-            if worst[0] < distance:
-                best.put((distance, index))
-            else:
-                best.put(worst)
-    return best
-
+error = np.count_nonzeros(validation_labels - neighbors_labels) / float(len(validation_labels))
+accuracy = 1.0 - error
+print "==========K_NEIGHBORS AVERAGE RATING=========="
+print "Validation Accuracy: %f" % (accuracy)
 #################################################################################
 #test = find_nearest_neighbors(0, 10)
-test = kmeans_recommendation(10)
 pdb.set_trace()
 
