@@ -28,6 +28,7 @@ def average(data):
     means = np.mean(data, axis=0)
     return means
 
+print "==========AVERAGE RATING=========="
 average_scores = average(train_data)
 
 average_validation = validation_features
@@ -45,7 +46,6 @@ average_labels = np.array(average_labels)
 error = np.count_nonzero(validation_labels - average_labels) / float(len(validation_labels))
 accuracy = 1.0 - error
 
-print "==========AVERAGE RATING=========="
 print "Validation Accuracy: %f" % (accuracy)
 
 def euclidian_distance(user1, user2):
@@ -107,11 +107,12 @@ def kneighbors_recommendation(k):
             recommendations[user] = vector
     return recommendations
 
-ten_neighbors = kneighbors_recommendation(1000)
+print "==========K_NEIGHBORS AVERAGE RATING=========="
+k_neighbors = kneighbors_recommendation(1000)
 neighbors_labels = []
 for index in range(len(validation_features)):
     user, joke = average_validation[index]
-    if ten_neighbors[user][joke-1] > 0:
+    if k_neighbors[user][joke-1] > 0:
         label = 1
     else:
         label = 0
@@ -120,7 +121,6 @@ neighbors_labels = np.array(neighbors_labels)
 
 error = np.count_nonzero(validation_labels - neighbors_labels) / float(len(validation_labels))
 accuracy = 1.0 - error
-print "==========K_NEIGHBORS AVERAGE RATING=========="
 print "Validation Accuracy: %f" % (accuracy)
 #################################################################################
 #test = find_nearest_neighbors(0, 10)
