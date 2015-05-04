@@ -93,15 +93,15 @@ class KMeans():
 
 #five = KMeans(images, 5)
 #print "Done with k=5"
-ten = KMeans(images, 10)
-print "Done with k=10"
-#twenty = KMeans(images, 20)
-#print "Done with k=20"
+#ten = KMeans(images, 10)
+#print "Done with k=10"
+twenty = KMeans(images, 20)
+print "Done with k=20"
 #pdb.set_trace()
 print "Visualizing"
 #five.visualize()
 #pdb.set_trace()
-ten.visualize()
+#ten.visualize()
 #pdb.set_trace()
-#twenty.visualize()
+twenty.visualize()
 print "Done"

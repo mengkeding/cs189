@@ -108,7 +108,7 @@ def kneighbors_recommendation(k):
     return recommendations
 
 print "==========K_NEIGHBORS AVERAGE RATING=========="
-k_neighbors = kneighbors_recommendation(1000)
+k_neighbors = kneighbors_recommendation(10)
 neighbors_labels = []
 for index in range(len(validation_features)):
     user, joke = average_validation[index]

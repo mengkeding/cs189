@@ -110,8 +110,12 @@ class PCA():
 #        pca = PCA(train_data, d=20, zero=False, maxiter=2000, lam=lam, eta=eta)
 #        pca.validate()
 
-#pca = PCA(train_data, d=20, zero=False, maxiter=10000, lam=0.1, eta=1e-9)
-pca = PCA(train_data, d=20, zero=True, lam=0.1)
+#for d in [2, 5, 10, 20]:
+#    print "==========PCA d=%d RATING==========" % (d)
+    #pca = PCA(train_data, d=20, zero=False, maxiter=10000, lam=0.1, eta=1e-9)
+    #pca = PCA(train_data, d=d, zero=True, lam=0)
+    #pca.validate()
+pca = PCA(train_data, d=20, zero=False, maxiter=1000, lam=0.1, eta=1e-5)
 pca.validate()
 
 # Kaggle
