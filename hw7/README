@@ -1,0 +1,18 @@
+David Wu
+22934420
+
+kmeans.py is for the kmeans section of the homework
+jokes.py is the warm up section
+PCA.py is 2.3
+
+Files require:
+scipy.io
+numpy
+scipy
+matplotlib
+
+Change each file's DATA_DIR file to the corresponding directories
+Simply run with:
+"python [file name]"
+
+uncomment/comment sections at the bottom of each file to run specific configuration
