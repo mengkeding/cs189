@@ -124,5 +124,4 @@ accuracy = 1.0 - error
 print "Validation Accuracy: %f" % (accuracy)
 #################################################################################
 #test = find_nearest_neighbors(0, 10)
-pdb.set_trace()
-
+#pdb.set_trace()
