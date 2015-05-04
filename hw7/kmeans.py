@@ -32,23 +32,23 @@ class KMeans():
         for iteration in range(100):
             print "Iteration %d" % (iteration)
             self.compute_means()
-            print "Recalculated Means"
+            #print "Recalculated Means"
             self.pick_all_clusters()
-            print "Repicked clusters"
+            #print "Repicked clusters"
             tmp = self.objective_function()
-            if tmp < self.loss:
-                print "===========BETTER============"
-                pass
-            elif tmp == self.loss:
-                print "Converged"
-                self.loss = tmp
-                break
-            else:
-                print "===========WORSE============"
+            #if tmp < self.loss:
+            #    print "===========BETTER============"
+            #    pass
+            #elif tmp == self.loss:
+            #    print "Converged"
+            #    self.loss = tmp
+            #    break
+            #else:
+            #    print "===========WORSE============"
             difference = abs(self.loss - tmp)
-            print "Difference: %f" % (difference)
+            #print "Difference: %f" % (difference)
             self.loss = tmp
-            print "Loss: %f" % (self.loss)
+            #print "Loss: %f" % (self.loss)
             self.losses.append(self.loss)
 
     ####################
@@ -86,19 +86,22 @@ class KMeans():
         for i in range(self.k):
             image = self.centroids[i].reshape((28, 28))
             imgplot = plt.imshow(image, cmap=cm.Greys)
-            plt.show()
+            #plt.show()
+            plt.imsave("visuals/"+str(self.k)+"_"+str(i), image, cmap=cm.Greys)
 
-pdb.set_trace()
+#pdb.set_trace()
 
-five = KMeans(images, 5)
-print "Done with k=5"
+#five = KMeans(images, 5)
+#print "Done with k=5"
 ten = KMeans(images, 10)
 print "Done with k=10"
-twenty = KMeans(images, 20)
-print "Done with k=20"
-pdb.set_trace()
-five.visualize()
-pdb.set_trace()
+#twenty = KMeans(images, 20)
+#print "Done with k=20"
+#pdb.set_trace()
+print "Visualizing"
+#five.visualize()
+#pdb.set_trace()
 ten.visualize()
-pdb.set_trace()
-twenty.visualize()
+#pdb.set_trace()
+#twenty.visualize()
+print "Done"
